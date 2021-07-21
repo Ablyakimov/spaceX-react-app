@@ -1,47 +1,45 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default Header = () => {
+import './header.scss'
+
+const Header = ({ rockets, changeRocket }) => {
     return(
-        <header class="header">
-                <img src="img/logo.svg" alt="Logo Space X" class="logo" />
-                <nav class="main-nav nav">
-                    <ul class="list">
-                        <li class="item">
-                            <a href="#" class="item-link">
-                                Falcon 1
-                            </a>
-                        </li>
-                        <li class="item">
-                            <a href="#" class="item-link">
-                                Falcon 9
-                            </a>
-                        </li>
-                        <li class="item">
-                            <a href="#" class="item-link">
-                                Falcon Heavy
-                            </a>
-                        </li>
-                        <li class="item">
-                            <a href="#" class="item-link">
-                                Updates
-                            </a>
-                        </li>
+        <header className="header">
+                <img src="img/logo.svg" alt="Logo Space X" className="logo" />
+                <nav className="main-nav nav">
+                    <ul className="list">
+                        {
+                            rockets.map((item, id) => (
+                                <li key={id} className="item">
+                                    <a 
+                                    href="/"
+                                    onClick={e => {
+                                        e.preventDefault()
+                                        changeRocket(item)
+                                    }}
+                                    className="item-link">{ item }</a>
+                                </li>
+                            ))
+                        }
                     </ul>
                 </nav>
-                <nav class="secondary-nav">
-                    <ul class="list">
-                        <li class="item">
-                            <a href="#" class="item-link">
+                <nav className="secondary-nav">
+                    <ul className="list">
+                        <li className="item">
+                            <Link to="/" className="item-link">
                                 Home
-                            </a>
+                            </Link>
                         </li>
-                        <li class="item">
-                            <a href="calendar.html" class="item-link">
+                        <li className="item">
+                            <Link to="/calendar" className="item-link">
                                 Calendar
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                 </nav>
             </header>
     )
 }
+
+export default Header

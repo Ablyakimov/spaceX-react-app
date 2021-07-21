@@ -1,122 +1,78 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Route, Switch } from 'react-router-dom';
+
+import Header from './components/Header';
+import Main from './components/Main';
+import Features from './components/Features';
+import Footer from './components/Footer';
+import Calendar from './pages/Calendar';
+
+import FetchData from './service/FetchData';
 
 function App() {
+    const fetchData = new FetchData();
+
+    const [state, setState] = useState({
+        rocket: 'Falcon 1',
+        rocketFeatures: null,
+        rockets: [],
+        company: null,
+    });
+
+    const updateRocket = () => {
+        fetchData
+            .getRocket()
+            .then((data) => {
+                setState((prev) => ({
+                    ...prev,
+                    rockets: data.map((item) => item.name),
+                }));
+                return data;
+            })
+            .then((data) => data.find((item) => item.name === state.rocket))
+            .then((rocketFeatures) => {
+                setState((prev) => ({ ...prev, rocketFeatures }));
+            });
+    };
+
+    const changeRocket = (rocket) => {
+        setState((prev) => ({ ...prev, rocket }));
+    };
+
+    const updateCompany = () => {
+        fetchData
+            .getCompany()
+            .then((company) => setState((prev) => ({ ...prev, company })));
+    };
+
+    useEffect(() => {
+        updateRocket();
+        updateCompany();
+    }, []);
+
+    useEffect(() => {
+        updateRocket();
+    }, [state.rocket]);
+
     return (
         <>
-            <section class="main">
-                <h1 class="title">Falcon 1</h1>
+            <Header rockets={state.rockets} changeRocket={changeRocket} />
 
-                <div class="video-container">
-                    <video
-                        class="video"
-                        autoPlay
-                        loop
-                        muted
-                        src="./video/moon.mp4"
-                    ></video>
-                </div>
-            </section>
+            <Switch>
+                <Route path="/calendar">
+                    <Main name={'Calendar SpaceX'} />
+                    <Calendar />
+                </Route>
+                <Route path="/users"></Route>
+                <Route path="/">
+                    <Main name={state.rocket} isVideo />
+                    {state.rocketFeatures && (
+                        <Features {...state.rocketFeatures} />
+                    )}
+                </Route>
+            </Switch>
 
-            <section class="features">
-                <h2 class="features-title">
-                    Falcon 1 <br />
-                    Overview
-                </h2>
-                <div class="overview">
-                    <table class="table">
-                        <caption class="table-title">Size</caption>
-                        <thead>
-                            <tr>
-                                <td class="table-column">HEIGHT</td>
-                                <td class="table-column">22.25 m / 73 ft</td>
-                            </tr>
-                            <tr>
-                                <td class="table-column">DIAMETER</td>
-                                <td class="table-column">1.68 m / 5.5 ft</td>
-                            </tr>
-                            <tr>
-                                <td class="table-column">MASS</td>
-                                <td class="table-column">
-                                    30,146 kg / 66,460 lb
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="table-column">PAYLOAD TO LEO</td>
-                                <td class="table-column">450 kg / 992 lb</td>
-                            </tr>
-                        </thead>
-                    </table>
-                    <img
-                        src="img/falcon-1.png"
-                        alt="rocket"
-                        class="rocket"
-                        data-rellax-speed="14"
-                    />
-                    <article>
-                        <h3 class="features-subtitle">DESCRIPTION</h3>
-                        <p class="features-text">
-                            The Falcon 1 was an expendable launch system
-                            privately developed and manufactured by SpaceX
-                            during 2006-2009. On 28 September 2008, Falcon 1
-                            became the first privately-developed liquid-fuel
-                            launch vehicle to go into orbit around the Earth.
-                        </p>
-                    </article>
-                </div>
-            </section>
-            <footer class="footer">
-                <img src="img/logo.svg" alt="logo Space X" class="logo" />
-                <nav class="footer-nav">
-                    <ul class="list">
-                        <li class="item">
-                            <a
-                                href="#"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                class="item-link"
-                            >
-                                Elon Musk Twitter
-                            </a>
-                        </li>
-                        <li class="item">
-                            <a
-                                href="#"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                class="item-link"
-                            >
-                                Twitter
-                            </a>
-                        </li>
-                        <li class="item">
-                            <a
-                                href="#"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                class="item-link"
-                            >
-                                Flickr
-                            </a>
-                        </li>
-                        <li class="item">
-                            <a
-                                href="#"
-                                rel="noopener noreferrer"
-                                target="_blank"
-                                class="item-link"
-                            >
-                                Website
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <p class="footer-text">
-                    For additional questions, contact
-                    <a class="footer-link" href="mailto:rideshare@spacex.com">
-                        rideshare@spacex.com
-                    </a>
-                </p>
-            </footer>
+            {state.company && <Footer {...state.company} />}
         </>
     );
 }
